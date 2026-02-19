@@ -23,8 +23,15 @@ research = ResearchAssistant()
 # --- TELEGRAM BOT LOGIC (VPS MODE) ---
 class VPSTelegramBot:
     def __init__(self):
-        self.token = config.TELEGRAM_SETTINGS["bot_token"]
-        self.chat_id = int(config.TELEGRAM_SETTINGS["chat_id"])
+        # Prefer Environment Variables directly (Render/Heroku style)
+        self.token = os.environ.get("TELEGRAM_BOT_TOKEN", config.TELEGRAM_SETTINGS.get("bot_token", ""))
+        chat_id_raw = os.environ.get("TELEGRAM_CHAT_ID", config.TELEGRAM_SETTINGS.get("chat_id", "0"))
+        
+        try:
+            self.chat_id = int(chat_id_raw) if chat_id_raw else 0
+        except ValueError:
+            self.chat_id = 0
+            logger.error(f"Invalid TELEGRAM_CHAT_ID: {chat_id_raw}")
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if update.effective_user.id != self.chat_id: return
