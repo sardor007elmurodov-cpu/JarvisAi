@@ -43,7 +43,8 @@ class DreamWeaver:
 
     def _get_log_summary(self):
         """Log faylidan so'nggi voqealarni olish"""
-        log_file = os.path.join(os.getcwd(), "jarvis.log")
+        from config import LOG_CONFIG
+        log_file = os.path.join(os.getcwd(), LOG_CONFIG["log_dir"], LOG_CONFIG["log_file"])
         if not os.path.exists(log_file):
             return "A peaceful day with no records."
             

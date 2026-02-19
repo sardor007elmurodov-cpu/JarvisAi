@@ -86,6 +86,6 @@ class CloudBridge:
             return f"Error: {e}"
 
 if __name__ == "__main__":
-    # Test uchun local server
-    bridge = CloudBridge("http://127.0.0.1:5000")
+    from config import CLOUD_SERVER_URL
+    bridge = CloudBridge(CLOUD_SERVER_URL)
     bridge.start_polling()

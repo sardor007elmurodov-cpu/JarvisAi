@@ -567,7 +567,8 @@ BLACKOUT_SETTINGS = {
 }
 
 # Cloud Settings
-CLOUD_SERVER_URL = "http://YOUR_VPS_IP:5000"
+CLOUD_SERVER_URL = "https://jarvisai-cortex.onrender.com"
+HYBRID_MODE = False # User requested full local power
 
 # Ovoz sozlamalari (Voice Settings)
 VOICE_SETTINGS = {
@@ -589,7 +590,8 @@ GESTURE_SETTINGS = {
 
 # GUI State
 GUI_SETTINGS = {
-    "minimized": False
+    "minimized": False,
+    "lite_mode": True # Enabled for stability
 }
 
 # Connectivity Settings

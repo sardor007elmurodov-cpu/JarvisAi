@@ -1,0 +1,82 @@
+C:\Users\user\Desktop\Ai agent\tutor_engine.py:5: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+[HUD DEBUG] Loading QApplication...
+qt.qpa.window: SetProcessDpiAwarenessContext() failed: Access is denied.
+Qt's default DPI awareness context is DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2. If you know what you are doing, you can overwrite this default using qt.conf (https://doc.qt.io/qt-6/highdpi.html#configuring-windows).
+[HUD DEBUG] Creating MasterHUD Window...
+2026-02-19 21:43:34,416 - WindowsExecutor - INFO - WindowsExecutor initialized
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1771519414.894388   11700 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1771519414.906043   27112 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+✅ JARVIS Logic: Gesture System Online (Modern Tasks Mode)
+2026-02-19 21:43:34,909 - VoiceCloning - INFO - Voice cloning: ElevenLabs not configured
+2026-02-19 21:43:37,262 - MemoryEngine - INFO - SQLite Database initialized.
+✅ Gemini Brain initialized (models/gemini-2.0-flash) [v2.0 SDK]
+2026-02-19 21:43:38,597 - CloudBridge - INFO - Connecting to Cloud Relay at https://jarvisai-cortex.onrender.com...
+✅ Gemini Brain initialized (models/gemini-2.0-flash) [v2.0 SDK]
+✅ Security Scanner: Active
+✅ Kamera boshlandi (background mode)
+2026-02-19 21:43:41,188 - WindowsExecutor - INFO - Camera started in background mode
+2026-02-19 21:43:41,326 - CommandParser - INFO - CommandParser initialized
+✅ Gemini Brain initialized (models/gemini-2.0-flash) [v2.0 SDK]
+2026-02-19 21:43:43,098 - MemoryEngine - INFO - SQLite Database initialized.
+2026-02-19 21:43:43,327 - TelegramUserBridge - INFO - Starting Telegram User bridge...
+2026-02-19 21:43:43,607 - WindowsExecutor - WARNING - SECURITY ALERT: Ko'p tarmoq ulanshlari: 106
+2026-02-19 21:43:45,171 - TelegramUserBridge - INFO - Telegram User bridge connected.
+2026-02-19 21:43:45,172 - TelegramUserBridge - INFO - Auto-reply listener active.
+✅ Gemini Brain initialized (models/gemini-2.0-flash) [v2.0 SDK]
+2026-02-19 21:43:47,233 - CodeHealer - INFO - Self-healing sequence initiated...
+⚠ OpenAI Quota Exceeded (429).
+✅ Gemini Brain initialized (models/gemini-2.0-flash) [v2.0 SDK]
+2026-02-19 21:43:48,362 - MemoryEngine - INFO - SQLite Database initialized.
+2026-02-19 21:43:48,363 - JARVIS - INFO - Elite JARVIS Core initialized.
+2026-02-19 21:43:48,363 - AutomationEngine - INFO - Automation Worker started.
+2026-02-19 21:43:48,366 - JARVIS - WARNING - [DEBUG MONITOR] Watching: C:\Users\user\Desktop\Ai agent\data\remote_command.txt
+2026-02-19 21:43:48,366 - JARVIS - INFO - Remote listener active.
+⚠ O'zbek ovozi topilmadi. Standart ovoz ishlatiladi.
+✓ TTS engine muvaffaqiyatli ishga tushdi
+⚠ Mikrofon xatoligi: No Default Input Device Available
+[HUD DEBUG] Initializing UI...
+[HUD DEBUG] Initializing FaceAuth...
+[HUD DEBUG] Initializing Autonomy Worker...
+2026-02-19 21:43:49,144 - OfflineVoice - INFO - Loading Whisper (tiny) model...
+[HUD DEBUG] Initializing Security Scanner...
+✅ Security Scanner: Active
+[HUD DEBUG] Initializing Global Eye...
+[HUD DEBUG] Initializing Voice Cloning...
+2026-02-19 21:43:49,377 - VoiceCloning - INFO - Voice cloning: ElevenLabs not configured
+[HUD DEBUG] Initializing Voice Biometrics...
+[HUD DEBUG] Initializing Social Sentience...
+[ INFO/2026-02-19 21:43:50,480] google_genai.models: AFC is enabled with max remote calls: 10.
+[HUD DEBUG] Starting Telegram Worker Thread...
+[HUD DEBUG] Telegram Worker Started.
+DEBUG: CameraWorker v16.0 Started (Sentinel Vision Active)
+🛰 Starting Integrated Telegram Monitor...
+Social Sentience Engine ishga tushmoqda...
+[ INFO/2026-02-19 21:43:50,810] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+W0000 00:00:1771519430.860858   20520 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1771519430.880065   19832 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+✅ JARVIS Logic: Gesture System Online (Modern Tasks Mode)
+[ INFO/2026-02-19 21:43:50,944] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+W0000 00:00:1771519431.010276   27156 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+2026-02-19 21:43:51,074 - SelfEvolution - INFO - ⚡ Self-Evolution Engine Activated...
+[ INFO/2026-02-19 21:43:51,074] SelfEvolution: ⚡ Self-Evolution Engine Activated...
+[HUD DEBUG] Lite Mode: Matrix Rain DISABLED.
+[HUD DEBUG] Lite Mode: Local Voice Recognition DISABLED.
+[HUD DEBUG] Initializing Privacy Shield...
+[HUD DEBUG] Privacy Shield initialized.
+[HUD DEBUG] Market Monitor DISABLED.
+[HUD DEBUG] MasterHUD Constructor COMPLETE.
+[HUD DEBUG] Showing Window...
+[ INFO/2026-02-19 21:43:51,867] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+[HUD DEBUG] Executing App Loop...
+⚠ Gemini API Quota Exceeded (429). Falling back to Groq...
+[ INFO/2026-02-19 21:43:52,501] httpx: HTTP Request: GET https://huggingface.co/api/models/Systran/faster-whisper-tiny/revision/main "HTTP/1.1 200 OK"
+⚠ OpenAI Quota Exceeded (429).

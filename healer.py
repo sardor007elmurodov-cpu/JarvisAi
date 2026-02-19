@@ -11,9 +11,10 @@ from config import GEMINI_API_KEY
 from utils import setup_logger
 
 class CodeHealer:
-    def __init__(self):
+    def __init__(self, core=None):
         from llm_brain import GeminiBrain
         from config import LOG_CONFIG
+        self.core = core
         self.logger = setup_logger("CodeHealer")
         self.brain = GeminiBrain()
         self.log_file = os.path.join(os.getcwd(), LOG_CONFIG["log_dir"], LOG_CONFIG["log_file"])

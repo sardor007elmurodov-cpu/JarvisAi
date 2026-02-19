@@ -504,11 +504,15 @@ class MasterHUD(QMainWindow):
         self.timer.start(40) 
         
         # 4. Camera System
-        self.cam_worker = CameraWorker(self.jarvis_core.executor.camera, face_auth=self.face_auth)
-        self.cam_worker.frame_update.connect(self._update_camera_feed)
-        self.cam_worker.raw_frame_update.connect(self.security.process_vision_frame)
-        self.cam_worker.analysis_update.connect(self._update_vision_analysis)
-        self.cam_worker.start()
+        if not config.GUI_SETTINGS.get("lite_mode"):
+            self.cam_worker = CameraWorker(self.jarvis_core.executor.camera, face_auth=self.face_auth)
+            self.cam_worker.frame_update.connect(self._update_camera_feed)
+            self.cam_worker.raw_frame_update.connect(self.security.process_vision_frame)
+            self.cam_worker.analysis_update.connect(self._update_vision_analysis)
+            self.cam_worker.start()
+        else:
+            self.cam_worker = None
+            print("[HUD DEBUG] Lite Mode: Camera System DISABLED.")
 
 
         # 4.1 Virtual Lock Screen (Hidden initially)
@@ -527,34 +531,47 @@ class MasterHUD(QMainWindow):
         self.watchdog_timer.start(5000) # Check every 5s
         
         # 5. Screen System
-        self.screen_worker = ScreenWorker()
-        self.screen_worker.screen_update.connect(self._update_screen_feed)
-        self.screen_worker.start()
+        if not config.GUI_SETTINGS.get("lite_mode"):
+            self.screen_worker = ScreenWorker()
+            self.screen_worker.screen_update.connect(self._update_screen_feed)
+            self.screen_worker.start()
+        else:
+            self.screen_worker = None
+            print("[HUD DEBUG] Lite Mode: Screen Sync DISABLED.")
 
         # 5.1 Network Guardian (Serious Engineering v8.5)
         self.net_worker = NetworkWorker()
         self.net_worker.network_update.connect(self._update_radar_feed)
         self.net_worker.start()
 
-        # 5.2 Autonomous Ghost Mode (Elite v9.0)
-        from ghost_mode import JARVISGhostMode
-        self.ghost = JARVISGhostMode(
-            self.jarvis_core.executor, 
-            terminal_callback=self.left_panel.terminal.add_log,
-            brain=self.jarvis_core.brain,
-            vision=self.jarvis_core.vision,
-            evo_callback=self.left_panel.evo_node.set_repair_status
-        )
-        self.ghost.start()
+        # Connect Bridge UI core
+        self.bridge.ui_core = self.core
         
+        # 5.2 Autonomous Ghost Mode (Elite v9.0)
+        if not self.jarvis_core.hybrid_mode:
+            from ghost_mode import JARVISGhostMode
+            self.ghost = JARVISGhostMode(
+                self.jarvis_core.executor, 
+                terminal_callback=self.left_panel.terminal.add_log,
+                brain=self.jarvis_core.brain,
+                vision=self.jarvis_core.vision,
+                evo_callback=self.left_panel.evo_node.set_repair_status
+            )
+            self.ghost.start()
+        else:
+            self.ghost = None
+
         # 5.3 Self-Evolution Engine (Elite v19.0)
-        from self_evolution import SelfEvolutionEngine
-        self.evolution = SelfEvolutionEngine(
-            brain=self.jarvis_core.brain,
-            terminal_callback=self.left_panel.terminal.add_log,
-            gamification=self.jarvis_core.executor.gamification
-        )
-        self.evolution.start()
+        if not self.jarvis_core.hybrid_mode:
+            from self_evolution import SelfEvolutionEngine
+            self.evolution = SelfEvolutionEngine(
+                brain=self.jarvis_core.brain,
+                terminal_callback=self.left_panel.terminal.add_log,
+                gamification=self.jarvis_core.executor.gamification
+            )
+            self.evolution.start()
+        else:
+            self.evolution = None
 
         # Evolution UI Update Timer
         self.evo_update_timer = QTimer(self)
@@ -563,23 +580,26 @@ class MasterHUD(QMainWindow):
         
         # Connect Biometric Request (Elite v13.0)
         self.jarvis_core.executor.on_biometric_request = self._vocal_auth_challenge
-
-        # Connect Bridge UI core
-        self.bridge.ui_core = self.core
         
         # Matrix Rain Effect (Background)
-        self.matrix_rain = MatrixRain(self.width(), self.height())
-        # Run Matrix update on a separate timer to control FPS independently
-        self.matrix_timer = QTimer(self)
-        self.matrix_timer.timeout.connect(self._update_matrix)
-        self.matrix_timer.start(50) # 20 FPS
-        self.bridge.ui_core = self.core
+        if not config.GUI_SETTINGS.get("lite_mode"):
+            self.matrix_rain = MatrixRain(self.width(), self.height())
+            self.matrix_timer = QTimer(self)
+            self.matrix_timer.timeout.connect(self._update_matrix)
+            self.matrix_timer.start(50) # 20 FPS
+        else:
+            self.matrix_rain = None
+            self.matrix_timer = None
+            print("[HUD DEBUG] Lite Mode: Matrix Rain DISABLED.")
 
         # 6. Voice System (Background Listener)
-        self.voice_worker = VoiceWorker(self.jarvis_core)
-        self.voice_worker.command_detected.connect(self._handle_voice_command)
-        if not "--silent" in sys.argv:
+        if not config.GUI_SETTINGS.get("lite_mode") and not "--silent" in sys.argv:
+            self.voice_worker = VoiceWorker(self.jarvis_core)
+            self.voice_worker.command_detected.connect(self._handle_voice_command)
             self.voice_worker.start()
+        else:
+            self.voice_worker = None
+            print("[HUD DEBUG] Lite Mode: Local Voice Recognition DISABLED.")
             
         # 7. Privacy Shield Overlay
         print("[HUD DEBUG] Initializing Privacy Shield...")
@@ -588,12 +608,16 @@ class MasterHUD(QMainWindow):
         print("[HUD DEBUG] Privacy Shield initialized.")
 
         # 8. Real-Time Market Monitor (Phase 5 Link)
-        from market_monitor import MarketMonitor
-        self.market_monitor = MarketMonitor()
-        self.market_timer = QTimer(self)
-        self.market_timer.timeout.connect(self._update_market_metrics)
-        self.market_timer.start(30000) # Every 30 seconds
-        self._update_market_metrics() # Initial fetch
+        if not config.GUI_SETTINGS.get("lite_mode") and not self.jarvis_core.hybrid_mode:
+            from market_monitor import MarketMonitor
+            self.market_monitor = MarketMonitor()
+            self.market_timer = QTimer(self)
+            self.market_timer.timeout.connect(self._update_market_metrics)
+            self.market_timer.start(30000) # Every 30 seconds
+            self._update_market_metrics() # Initial fetch
+        else:
+            self.market_monitor = None
+            print("[HUD DEBUG] Market Monitor DISABLED.")
         print("[HUD DEBUG] MasterHUD Constructor COMPLETE.")
 
     def _update_market_metrics(self):
@@ -887,12 +911,12 @@ class MasterHUD(QMainWindow):
     def _kernel_watchdog(self):
         """Monitor and restart crashed workers (Self-Repair)"""
         # 1. Camera Worker
-        if not self.cam_worker.isRunning():
+        if self.cam_worker and not self.cam_worker.isRunning():
             self.left_panel.terminal.add_log("🔧 [KERNEL] Camera worker died. Restarting...")
             self.cam_worker.start()
             
         # 2. Screen Worker
-        if not self.screen_worker.isRunning():
+        if self.screen_worker and not self.screen_worker.isRunning():
             self.left_panel.terminal.add_log("🔧 [YADRO] Ekran jarayoni to'xtadi. Qayta yuklanmoqda...")
             self.screen_worker.start()
             
@@ -1222,10 +1246,10 @@ class MasterHUD(QMainWindow):
             self.focus_btn.setStyleSheet(self._get_btn_style())
 
     def _toggle_matrix(self):
-        if self.matrix_btn.isChecked():
+        if self.matrix_rain and self.matrix_btn.isChecked():
             self.matrix_rain.active = True
             self.matrix_rain.resize(self.width(), self.height())
-        else:
+        elif self.matrix_rain:
             self.matrix_rain.active = False
             self.update()
 
@@ -1261,7 +1285,7 @@ class MasterHUD(QMainWindow):
         painter.fillRect(self.rect(), QColor(2, 4, 8, 250))
         
         # 1.B MATRIX RAIN LAYER
-        if hasattr(self, 'matrix_rain') and self.matrix_rain.active:
+        if self.matrix_rain and self.matrix_rain.active:
             self.matrix_rain.draw(painter)
         
         # 2. HEX GRID PATTERN (Subtle)

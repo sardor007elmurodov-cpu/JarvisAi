@@ -40,14 +40,30 @@ class JARVIS:
     def __init__(self):
         self.logger = setup_logger("JARVIS")
         
+        # Hybrid Mode Check
+        try:
+            from config import HYBRID_MODE
+            self.hybrid_mode = HYBRID_MODE
+        except:
+            self.hybrid_mode = False
+
         # Core Modullar (Engines)
         self.executor = WindowsExecutor()
         self.parser = CommandParser()
-        self.brain = GeminiBrain()
-        self.memory = MemoryEngine()
-        self.security = SecurityEngine(memory=self.memory)
-        self.translator = LanguageProcessor()
-        self.automation = AutomationEngine(core=self)
+        
+        if self.hybrid_mode:
+            self.logger.info("☁️  JARVIS Core starting in HYBRID EXECUTION mode.")
+            self.brain = None # Brain is on the Cloud
+            self.memory = MemoryEngine()
+            self.security = SecurityEngine(memory=self.memory)
+            self.translator = None 
+            self.automation = None
+        else:
+            self.brain = GeminiBrain()
+            self.memory = MemoryEngine()
+            self.security = SecurityEngine(memory=self.memory)
+            self.translator = LanguageProcessor()
+            self.automation = AutomationEngine(core=self)
         self.voice = None # GUI yoki CLI tomonidan o'rnatiladi
         self.pending_command = None # Tasdiqlash kutilayotgan buyruq
         self.on_speak = None # CALLBACK (Phase 4 Refinement)
@@ -55,13 +71,17 @@ class JARVIS:
         self.lock = threading.Lock() # Thread safety lock
         
         # 2. Telegram User Bridge (Background Messaging & Auto-Reply)
-        try:
-            from telegram_user_bridge import TelegramUserBridge
-            self.telegram_bridge = TelegramUserBridge()
-            threading.Thread(target=self.telegram_bridge.run, daemon=True).start()
-            self.executor.telegram_bridge = self.telegram_bridge
-        except Exception as e:
-            self.logger.warning(f"Telegram User Bridge initialization failed: {e}")
+        if not self.hybrid_mode:
+            try:
+                from telegram_user_bridge import TelegramUserBridge
+                self.telegram_bridge = TelegramUserBridge()
+                threading.Thread(target=self.telegram_bridge.run, daemon=True).start()
+                self.executor.telegram_bridge = self.telegram_bridge
+            except Exception as e:
+                self.logger.warning(f"Telegram User Bridge initialization failed: {e}")
+        else:
+            self.telegram_bridge = None
+            self.logger.info("☁️  Telegram Bridge offloaded to Cloud.")
 
         # 2.5 Telegram Bot (Command Center) - Now runs via start.py
         # try:
@@ -77,28 +97,35 @@ class JARVIS:
         from mood_engine import MoodEngine
         self.mood = MoodEngine()
         
-        # 4. Vision Engine (On-Demand)
-        from vision_engine import VisionEngine
-        self.vision = VisionEngine(brain_module=self.brain)
-
-        # 5. Research Assistant
-        from research_assistant import ResearchAssistant
-        self.research = ResearchAssistant()
-
-        # 6. Neural Indexer (Second Brain / RAG)
-        from neural_indexer import NeuralIndexer
-        self.neural_indexer = NeuralIndexer(brain=self.brain)
-        # Start background indexing
-        # self.neural_indexer.index_hub()
-        
-        # 7. Proactive Vision (Elite v20.0)
-        from proactive_vision import ProactiveVision
-        self.proactive_vision = ProactiveVision(core=self, brain=self.brain)
-        # self.proactive_vision.start()
-        
-        # 8. Self-Healing System (Healer)
-        from healer import CodeHealer
-        self.healer = CodeHealer()
+        if not self.hybrid_mode:
+            # 4. Vision Engine (On-Demand)
+            from vision_engine import VisionEngine
+            self.vision = VisionEngine(brain_module=self.brain)
+    
+            # 5. Research Assistant
+            from research_assistant import ResearchAssistant
+            self.research = ResearchAssistant()
+    
+            # 6. Neural Indexer (Second Brain / RAG)
+            from neural_indexer import NeuralIndexer
+            self.neural_indexer = NeuralIndexer(brain=self.brain)
+            # Start background indexing
+            # self.neural_indexer.index_hub()
+            
+            # 7. Proactive Vision (Elite v20.0)
+            from proactive_vision import ProactiveVision
+            self.proactive_vision = ProactiveVision(core=self, brain=self.brain)
+            # self.proactive_vision.start()
+            
+            # 8. Self-Healing System (Healer)
+            from healer import CodeHealer
+            self.healer = CodeHealer(core=self)
+        else:
+            self.vision = None
+            self.research = None
+            self.neural_indexer = None
+            self.proactive_vision = None
+            self.healer = None
         self._start_healer_monitor()
         
         # 9. Elite Personal AI (Custom)
@@ -339,48 +366,52 @@ class JARVIS:
             ai_verbal = None
             vision_keywords = ["rasm", "ekran", "bu nima", "ko'r", "see", "screen", "picture", "what is this"]
             
-            if action == "unknown" and self.brain._initialized:
-                # Check if it's a vision request
-                if any(k in text.lower() for k in vision_keywords):
-                    self.logger.info("Vision request detected. Capturing screen...")
-                    # Take a quick screenshot for context
-                    snap_path = "vision_context.png"
-                    self.executor.execute({"action": "screenshot", "parameters": {"path": snap_path}})
-                    # Analyze with context
-                    prompt = f"User asked: '{text}'. Based on the screen image, provide a concise verbal response."
-                    ai_verbal = self.brain.analyze_image(snap_path, prompt)
-                    if ai_verbal == "ERROR_QUOTA_EXCEEDED":
-                        ai_verbal = "Janob, hozirda tahlil quvvatim yetmayapti. Bir ozdan keyin urinib ko'ring."
-                    action = "ai_conversation"
-                else:
-                    # --- LONG-TERM MEMORY INTEGRATION ---
-                    # 1. Retrieve Facts
-                    facts = self.memory.search_facts(text)
-                    context_prompt = text
-                    if facts:
-                        fact_list = "\n".join([f"- {f[0]}" for f in facts])
-                        context_prompt = f"CONTEXT (User Facts):\n{fact_list}\n\nUSER QUERY:\n{text}"
-                        self.logger.info(f"Memory Augmented Prompt with {len(facts)} facts.")
-
-                    # 1.5. Retrieve Local Documents (RAG)
-                    local_context = self.neural_indexer.query(text)
-                    if local_context and "topilmadi" not in local_context:
-                         context_prompt = f"LOCAL DOCUMENTS (RAG):\n{local_context}\n\n" + context_prompt
-                         self.logger.info("RAG Context injected into Brain prompt.")
-
-                    # 2. Generate Response (Elite AI Personalized)
-                    ai_verbal = self.elite_ai.process(text)
-                    
-                    # 3. Extract New Facts (Background)
-                    if len(text) > 10:
-                        threading.Thread(
-                            target=self.brain.extract_and_save_facts,
-                            args=(text, self.memory),
-                            daemon=True
-                        ).start()
-                    
-                    if ai_verbal:
+            if action == "unknown":
+                if self.hybrid_mode:
+                    return {"verbal_response": "Janob, hozirda GIBERID rejimdaman. Aqlli savollar va tadqiqotlarni Telegram bot orqali amalga oshirishingizni so'rayman.", "success": True}
+                
+                if self.brain and self.brain._initialized:
+                    # Check if it's a vision request
+                    if any(k in text.lower() for k in vision_keywords):
+                        self.logger.info("Vision request detected. Capturing screen...")
+                        # Take a quick screenshot for context
+                        snap_path = "vision_context.png"
+                        self.executor.execute({"action": "screenshot", "parameters": {"path": snap_path}})
+                        # Analyze with context
+                        prompt = f"User asked: '{text}'. Based on the screen image, provide a concise verbal response."
+                        ai_verbal = self.brain.analyze_image(snap_path, prompt)
+                        if ai_verbal == "ERROR_QUOTA_EXCEEDED":
+                            ai_verbal = "Janob, hozirda tahlil quvvatim yetmayapti. Bir ozdan keyin urinib ko'ring."
                         action = "ai_conversation"
+                    else:
+                        # --- LONG-TERM MEMORY INTEGRATION ---
+                        # 1. Retrieve Facts
+                        facts = self.memory.search_facts(text)
+                        context_prompt = text
+                        if facts:
+                            fact_list = "\n".join([f"- {f[0]}" for f in facts])
+                            context_prompt = f"CONTEXT (User Facts):\n{fact_list}\n\nUSER QUERY:\n{text}"
+                            self.logger.info(f"Memory Augmented Prompt with {len(facts)} facts.")
+
+                        # 1.5. Retrieve Local Documents (RAG)
+                        local_context = self.neural_indexer.query(text)
+                        if local_context and "topilmadi" not in local_context:
+                             context_prompt = f"LOCAL DOCUMENTS (RAG):\n{local_context}\n\n" + context_prompt
+                             self.logger.info("RAG Context injected into Brain prompt.")
+
+                        # 2. Generate Response (Elite AI Personalized)
+                        ai_verbal = self.elite_ai.process(text)
+                        
+                        # 3. Extract New Facts (Background)
+                        if len(text) > 10:
+                            threading.Thread(
+                                target=self.brain.extract_and_save_facts,
+                                args=(text, self.memory),
+                                daemon=True
+                            ).start()
+                        
+                        if ai_verbal:
+                            action = "ai_conversation"
             
             # 4. Execute qilish
             if action != "ai_conversation" and action != "unknown":
