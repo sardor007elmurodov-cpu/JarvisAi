@@ -1,0 +1,35 @@
+# JARVIS Cloud .gitignore
+__pycache__/
+*.pyc
+.venv/
+.env
+*.db
+*.session
+*.session-journal
+recordings/
+captures/
+research/
+dreams/
+logs/
+*.zip
+*.bat
+*.vbs
+Remote_Desktop_Connection*
+current_screen.png
+check_audio.py
+search_vps_info.py
+
+# Keep only necessary modules
+!vps_agent.py
+!elite_ai.py
+!research_assistant.py
+!llm_brain.py
+!utils.py
+!config.py
+!requirements.txt
+!telegram_bot.py
+!memory.py
+!social_sentience.py
+!agent.py
+!render.yaml
+!background_automation.py

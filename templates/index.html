@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS | QUANTUM GATEWAY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00e0ff;
+            --primary-glow: rgba(0, 224, 255, 0.4);
+            --bg-dark: #010204;
+            --glass: rgba(10, 20, 30, 0.7);
+            --glass-border: rgba(0, 224, 255, 0.2);
+            --danger: #ff4444;
+            --accent: #ffaa00;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 224, 255, 0.05) 0%, transparent 70%),
+                linear-gradient(rgba(0, 224, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 224, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+            gap: 30px;
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary);
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 5px 12px;
+            background: rgba(0, 224, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--glass-border);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Stats Section */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .stat-bar-bg {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: 0.5s ease;
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        /* Control Grid */
+        .grid-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--primary);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .btn i {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: rgba(0, 224, 255, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn:hover i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .btn.danger {
+            color: var(--danger);
+        }
+
+        .btn.danger:hover {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: var(--danger);
+        }
+
+        /* Terminal */
+        .terminal {
+            background: #000;
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 250px;
+            box-shadow: inset 0 0 20px rgba(0, 224, 255, 0.05);
+        }
+
+        .terminal-header {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #terminal-output {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #55aaff;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .line {
+            border-left: 2px solid transparent;
+            padding-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        .line.success {
+            border-color: var(--primary);
+            color: #00ffaa;
+        }
+
+        .line.error {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .line .prefix {
+            opacity: 0.4;
+            margin-right: 8px;
+            font-size: 0.7rem;
+        }
+
+        .terminal-input {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        .terminal-input i {
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .terminal-input input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 100%;
+            outline: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<style>
+    /* ADDED/UPDATED STYLES FOR MOBILE TACTICAL UI */
+    .tab-content {
+        display: none;
+        height: 100%;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .tab-content.active {
+        display: flex;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 5, 10, 0.95);
+        border-top: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-around;
+        padding: 15px 0;
+        z-index: 200;
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-btn {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .nav-btn.active {
+        color: var(--primary);
+        text-shadow: 0 0 10px var(--primary);
+    }
+
+    .nav-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Cam Stream */
+    .cam-container {
+        width: 100%;
+        height: 300px;
+        background: #000;
+        border: 1px solid var(--primary);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cam-feed {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cam-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: var(--danger);
+        font-family: 'JetBrains Mono';
+        font-size: 0.8rem;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 5px;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Typer & Voice Input */
+    .input-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .tactical-input {
+        flex: 1;
+        background: rgba(0, 224, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        padding: 15px;
+        font-family: 'JetBrains Mono';
+        outline: none;
+    }
+
+    .tactical-btn {
+        background: var(--primary);
+        color: #000;
+        border: none;
+        padding: 15px 25px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Mood Orb */
+    .mood-indicator {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, var(--primary), #000);
+        box-shadow: 0 0 20px var(--primary);
+        margin: 0 auto;
+        transition: 1s;
+    }
+</style>
+</head>
+
+<body>
+    <main class="main-container" style="padding-bottom: 80px;">
+        <!-- TAB 1: DASHBOARD -->
+        <div id="tab-home" class="tab-content active">
+            <header>
+                <div>
+                    <p style="color: rgba(255,255,255,0.3); font-size: 0.6rem; letter-spacing: 2px;">JARVIS_LINK_v2.0
+                    </p>
+                    <h1>MOBILE COMMAND</h1>
+                </div>
+                <div class="mood-indicator" id="mood-orb"></div>
+            </header>
+
+            <section class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label">CPU LOAD</div>
+                    <div class="stat-value" id="cpu-val">--%</div>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill" id="cpu-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">RAM USAGE</div>
+                    <div class="stat-value" id="ram-val">--%</div>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill" id="ram-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid-section">
+                <div class="section-title">QUICK ACTIONS</div>
+                <div class="actions-grid">
+                    <div class="btn" onclick="send('Musiqa qo\'y')"><i class="fas fa-play"></i><span>MUSIC</span></div>
+                    <div class="btn" onclick="send('Ekranni blokla')"><i class="fas fa-lock"></i><span>LOCK</span></div>
+                    <div class="btn" onclick="send('Screenshot')"><i class="fas fa-camera"></i><span>SNAP</span></div>
+                    <div class="btn danger" onclick="confirmCmd('shutdown', 'SHUTDOWN?')"><i
+                            class="fas fa-power-off"></i><span>KILL</span></div>
+                </div>
+            </div>
+
+            <section class="terminal">
+                <div class="terminal-header"><span>[ LOGS ]</span> <span id="timestamp">--:--</span></div>
+                <div id="terminal-output"></div>
+            </section>
+        </div>
+
+        <!-- TAB 2: CAMERA -->
+        <div id="tab-cam" class="tab-content">
+            <header>
+                <h1>VISUAL FEED</h1>
+            </header>
+            <div class="cam-container">
+                <img src="" id="cam-img" class="cam-feed" alt="FEED_OFFLINE">
+                <div class="cam-overlay">REC ●</div>
+            </div>
+            <div class="btn" onclick="toggleCam()">REFRESH FEED</div>
+        </div>
+
+        <!-- TAB 3: TOOLS (Typer & Speak) -->
+        <div id="tab-tools" class="tab-content">
+            <header>
+                <h1>TACTICAL TOOLS</h1>
+            </header>
+
+            <div class="stat-box">
+                <div class="stat-label">REMOTE VOICE (TTS)</div>
+                <div class="input-group">
+                    <input type="text" id="speak-input" class="tactical-input" placeholder="Say something...">
+                    <button class="tactical-btn" onclick="remoteSpeak()"><i class="fas fa-bullhorn"></i></button>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-label">TYPER BOT INJECTION</div>
+                <div class="input-group">
+                    <textarea id="typer-input" class="tactical-input" rows="3" placeholder="Text to type..."></textarea>
+                </div>
+                <button class="tactical-btn" style="width:100%; margin-top:10px" onclick="remoteType()">INJECT
+                    TEXT</button>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fas fa-cube"></i><span
+                class="nav-label">DASH</span></div>
+        <div class="nav-btn" onclick="switchTab('cam', this)"><i class="fas fa-eye"></i><span
+                class="nav-label">CAM</span></div>
+        <div class="nav-btn" onclick="switchTab('tools', this)"><i class="fas fa-terminal"></i><span
+                class="nav-label">TOOLS</span></div>
+    </nav>
+
+    <script>
+        // CORE FUNCTIONS
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (tabId === 'cam') startCam();
+            else stopCam();
+        }
+
+        const camImg = document.getElementById('cam-img');
+        function startCam() { camImg.src = "/video_feed?" + new Date().getTime(); }
+        function stopCam() { camImg.src = ""; }
+        function toggleCam() { startCam(); }
+
+        async function remoteSpeak() {
+            const txt = document.getElementById('speak-input').value;
+            await fetch('/speak', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: txt })
+            });
+            document.getElementById('speak-input').value = '';
+        }
+
+        async function remoteType() {
+            const txt = document.getElementById('typer-input').value;
+            await fetch('/typer', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: txt })
+            });
+            document.getElementById('typer-input').value = '';
+        }
+
+        /* EXISTING LOGIC PRESERVED BELOW (Shortened) */
+        const output = document.getElementById('terminal-output');
+        async function send(command) {
+            try {
+                await fetch('/execute', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+                addMsg("SENT: " + command);
+            } catch (e) { addMsg("ERROR"); }
+        }
+        function addMsg(msg) {
+            output.innerHTML += `<div class="line">${msg}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        function confirmCmd(cmd, msg) { if (confirm(msg)) send(cmd); }
+
+        async function updateStatus() {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                document.getElementById('cpu-val').innerText = data.cpu + '%';
+                document.getElementById('cpu-bar').style.width = data.cpu + '%';
+                document.getElementById('ram-val').innerText = data.ram + '%';
+                document.getElementById('ram-bar').style.width = data.ram + '%';
+                document.getElementById('timestamp').innerText = data.timestamp;
+            } catch (e) { }
+        }
+        setInterval(updateStatus, 2000); updateStatus();
+    </script>
+</body>
+
+</html>

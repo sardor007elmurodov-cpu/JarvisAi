@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS | AUTH_REQUIRED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00e0ff;
+            --bg: #010204;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, rgba(0, 224, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .auth-card {
+            background: rgba(10, 20, 30, 0.8);
+            border: 1px solid rgba(0, 224, 255, 0.3);
+            padding: 50px;
+            width: 350px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid var(--primary);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .glow-ring {
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+            animation: breathe 3s infinite ease-in-out;
+            position: relative;
+        }
+
+        .glow-ring::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(8px);
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            font-weight: 300;
+            letter-spacing: 5px;
+            font-size: 1.2rem;
+            margin: 0 0 10px;
+            color: var(--primary);
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 224, 255, 0.3);
+            color: #fff;
+            padding: 15px;
+            margin: 30px 0 15px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 224, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .error {
+            color: #ff4444;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        /* Corner Brackets */
+        .corner {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--primary);
+            border-style: solid;
+            opacity: 0.5;
+        }
+
+        .tl {
+            top: 10px;
+            left: 10px;
+            border-width: 2px 0 0 2px;
+        }
+
+        .tr {
+            top: 10px;
+            right: 10px;
+            border-width: 2px 2px 0 0;
+        }
+
+        .bl {
+            bottom: 10px;
+            left: 10px;
+            border-width: 0 0 2px 2px;
+        }
+
+        .br {
+            bottom: 10px;
+            right: 10px;
+            border-width: 0 2px 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+        <div class="glow-ring"></div>
+        <h2>AUTHENTICATION</h2>
+        <p style="font-size: 0.6rem; opacity: 0.4; letter-spacing: 1px;">ENCRYPTED_OS_GATEWAY</p>
+
+        <form action="/login" method="post">
+            <input type="password" name="password" placeholder="ENTER SYSTEM KEY" required autofocus>
+            <button type="submit">INITIALIZE</button>
+        </form>
+        {% if error %}<p class="error">> {{ error }}</p>{% endif %}
+    </div>
+</body>
+
+</html>
