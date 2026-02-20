@@ -568,7 +568,7 @@ BLACKOUT_SETTINGS = {
 
 # Cloud Settings
 CLOUD_SERVER_URL = "https://jarvisai-cortex.onrender.com"
-HYBRID_MODE = False # User requested full local power
+HYBRID_MODE = True # Offloading brain to Cloud (Render)
 
 # Ovoz sozlamalari (Voice Settings)
 VOICE_SETTINGS = {
